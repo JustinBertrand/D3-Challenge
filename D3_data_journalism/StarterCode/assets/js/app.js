@@ -4,8 +4,8 @@
 var margin = {
         top: 40,
         right: 40,
-        bottom: 40,
-        left: 40
+        bottom: 80,
+        left: 60
     },
     svgWidth = 800
     svgHeight = 600
@@ -20,9 +20,6 @@ var svg = d3.select("#scatter").append("svg").attr("width", svgWidth).attr("heig
 
 // Append chart element to the SVG
 var chartGroup = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-// Slide the text over to align with chart
-// d3.select("#article").attr("transform", `translate(${margin.left}, 0)`);
 
 //Read the data and get ready to do stuff with it
 d3.csv("assets/data/data.csv").then(function(data) {
@@ -39,8 +36,6 @@ d3.csv("assets/data/data.csv").then(function(data) {
         .domain([38000, 75000]) // see same line for y-axis
         .range([0, chartWidth]);
   
-    // xScale.nice();
-
     chartGroup.append("g")
         .attr("transform", `translate(0, ${chartHeight})`)
         .call(d3.axisBottom(xScale));
@@ -49,13 +44,11 @@ d3.csv("assets/data/data.csv").then(function(data) {
     var yScale = d3.scaleLinear()
         .domain([21, 36]) // switch to [0, d3.max(data.**columnName**)]
         .range([chartHeight, 0]);
-  
-    // yScale.nice();
 
     chartGroup.append("g")
         .call(d3.axisLeft(yScale));
 
-    // Add dots
+    // Add some dots
     chartGroup.append('g')
         .selectAll("dot")
         .data(data)
@@ -68,7 +61,8 @@ d3.csv("assets/data/data.csv").then(function(data) {
             })
             .style("fill", "#69b382")
             .attr("opacity", .7);
-            
+    
+    // Slap some labels on the dots
     chartGroup.append('g')
         .selectAll("text")
         .data(data)
@@ -78,23 +72,30 @@ d3.csv("assets/data/data.csv").then(function(data) {
             .attr("x", function (data) {return xScale(data.income);})
             .attr("y", function (data) {return yScale(data.obesity) + 5;})
             .attr("font_family", "sans-serif")  // Font type
-            .attr("font-size", "16px")  // Font size
+            .attr("font-size", "16")  // Font size
             .attr("fill", "white")   // Font color
             .text(function(data) {return data.abbr;});
-    
+        
+    // Label the x-axis
     chartGroup.append("text")
-                .attr("transform", `translate(${width / 2}, ${height + margin.top + 20})`)
-                    .text("Your da");
+                .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.bottom / 2})`)
+                    .text("Average statewide income ($)")
+                    .attr("text-anchor", "middle");
     
+    // Label the y-axis
     chartGroup.append("text")
-                .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top})`)
-                    .text("Your mum");
-          
-})
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (chartHeight / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Obesity rate (%)");
 
-// TO DO:
-// DONE! Properly center graph inside element (i.e. Move axes into frame)
-// DONE! Fix axes' range and domain, and set ticks
-// DONE! Plot data
-// DONE! Label data points with state abbreviations
-// 5. Label graph & axes
+    // Add a graph title
+    chartGroup.append("text")
+    .attr("transform", `translate(${chartWidth / 2}, 0)`)
+        .text("Obesity vs. Income by State")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "24");
+
+})
