@@ -11,7 +11,7 @@ var margin = {
     svgHeight = 600
     chartWidth = svgWidth - margin.left - margin.right,
     chartHeight = svgHeight - margin.top - margin.bottom
-    circRad = 20
+    circRad = 10
     console.log("Chart height:", chartHeight, "Chart width:", chartWidth)
     console.log("SVG height:", svgHeight, "SVG width:", svgWidth)
 
@@ -28,10 +28,10 @@ d3.csv("assets/data/data.csv").then(function(data) {
     console.log(data);
     console.log("Obesity:")
     data.forEach(function(data) {
-        console.log(data.obesity)
+        console.log("State:", data.abbr, "Obesity:", data.obesity, "Income:", data.income)
     })
 
-    // Add X axis (income)
+    // Add x-axis (income)
     var xScale = d3.scaleLinear()
         .domain([38000, 75000]) // see same line for y-axis
         .range([0, chartWidth]);
@@ -40,7 +40,7 @@ d3.csv("assets/data/data.csv").then(function(data) {
         .attr("transform", `translate(0, ${chartHeight})`)
         .call(d3.axisBottom(xScale));
 
-    // Add Y axis (obesity)
+    // Add y-axis (obesity)
     var yScale = d3.scaleLinear()
         .domain([21, 36]) // switch to [0, d3.max(data.**columnName**)]
         .range([chartHeight, 0]);
@@ -57,7 +57,7 @@ d3.csv("assets/data/data.csv").then(function(data) {
             .attr("cx", function(data) {return xScale(data.income);})
             .attr("cy", function(data) {return yScale(data.obesity);})
             .attr("r", function(data) { // Do some silly math to reflect variance and margin of error in circle size
-                return circRad + (data.incomeMoe * (data.obesityHigh - data.obesityLow) / (circRad ** 2));
+                return circRad + ((data.incomeMoe * (data.obesityHigh - data.obesityLow) / (circRad ** 2)) / 2);
             })
             .style("fill", "#69b382")
             .attr("opacity", .7);
@@ -72,7 +72,7 @@ d3.csv("assets/data/data.csv").then(function(data) {
             .attr("x", function (data) {return xScale(data.income);})
             .attr("y", function (data) {return yScale(data.obesity) + 5;})
             .attr("font_family", "sans-serif")  // Font type
-            .attr("font-size", "16")  // Font size
+            .attr("font-size", "12")  // Font size
             .attr("fill", "white")   // Font color
             .text(function(data) {return data.abbr;});
         
